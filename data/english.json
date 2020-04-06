@@ -5,9 +5,10 @@
     "fixed": {
         "SA2": "22.04.2020"
     },
-    "modules": [
-        {
-            "name": "Voc Work"
+    "modules": {
+        "0":{
+            "name": "Voc Work",
+            "desc": "toast"
         }
-    ]
+    }
 }
