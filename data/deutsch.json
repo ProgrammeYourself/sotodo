@@ -1,16 +1,16 @@
 {
-    "name": "deutsch",
-    "description": "Workload for the 1.class-LB",
-    "for_class": "1abHIT",
-    "fixed": {
-        "SA2": "11.03.2020",
-        "T3": "15.04.2020",
-        "T4": "06.05.2020"
-    },
-    "modules": [
-        {
-            "name": "Bericht",
-            "description": "Hello"
-        }
-    ]
+	"name": "deutsch",
+	"description": "Workload for the 1.class-LB",
+	"for_class": "1abHIT",
+	"fixed": {
+		"SA2": "11.03.2020",
+		"T3": "15.04.2020",
+		"T4": "06.05.2020"
+	},
+	"modules": {
+		"3.3": {
+			"name": "Bericht",
+			"desc": "Hello"
+		}
+	}
 }
