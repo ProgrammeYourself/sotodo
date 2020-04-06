@@ -1,0 +1,10 @@
+{
+    "name": "maths",
+    "description": "Workload for the 1.class-LB",
+    "for_class": "1abHIT",
+    "modules": [
+        {
+            "name": "S02C"
+        }
+    ]
+}

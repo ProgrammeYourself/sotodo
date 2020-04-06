@@ -1,0 +1,10 @@
+{
+    "name": "sew",
+    "description": "Workload for the 1.class-LB",
+    "for_class": "1abHIT",
+    "modules": [
+        {
+            "name": "G2a"
+        }
+    ]
+}
