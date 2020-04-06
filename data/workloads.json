@@ -1,10 +1,10 @@
 {
     "workloads": [
-        "deutsch.json",
-        "english.json",
-        "maths.json",
-        "sew.json",
-        "medt.json",
-        "syt.json"
+        "deutsch",
+        "english",
+        "maths",
+        "sew",
+        "medt",
+        "syt"
     ]
 }
