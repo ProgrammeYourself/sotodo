@@ -1,0 +1,35 @@
+{
+    "workloads": [
+        {
+            "name": "workload1",
+            "description": "Workload for the 1.class-LB",
+            "for_class": "1abHIT",
+            "subjects": [
+                {
+                    "subject": "deutsch",
+                    "teachers": []
+                },
+                {
+                    "subject": "english",
+                    "teachers": []
+                },
+                {
+                    "subject": "math",
+                    "teachers": []
+                },
+                {
+                    "subject": "medt",
+                    "teachers": []
+                },
+                {
+                    "subject": "sew",
+                    "teachers": []
+                },
+                {
+                    "subject": "syt",
+                    "teachers": []
+                }
+            ]
+        }
+    ]
+}
