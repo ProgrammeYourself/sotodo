@@ -10,10 +10,6 @@
 		"0.0": {
 			"name": "S02C",
 			"desc": "tsort"
-		},
-		"2.2": {
-			"name": "no",
-			"desc": "desc"
 		}
 	}
 }

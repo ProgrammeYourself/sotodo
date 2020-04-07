@@ -52,21 +52,25 @@ def ArgumentHandler(argv):
         elif argc>7:
             raise CommonCode(4,argv[1],str(argc-6))
         arg  = argv[1]
+        num  = argv[2]
+        name = argv[3]
+        desc = argv[4]
+        cat  = argv[5]
         path = argv[6]
         wlp=os.path.join(path,"workloads.json")
         if not os.path.exists(wlp):
             raise CommonCode(24,wlp,"file")
         with open(wlp, "r") as wlf:
             categories = json.load(wlf)["workloads"]
-        if argv[5] not in categories:
-            raise CommonCode(7,arg,argv[5],": category does not exist")
-        with open("%s/%s.json"%(path, argv[5]), "r") as fs:
+        if cat not in categories:
+            raise CommonCode(7,arg,cat,": category does not exist")
+        with open("%s/%s.json"%(path,cat), "r") as fs:
             data = json.load(fs)
         if "modules" not in data.keys():
-            data["modules"]={argv[2]:{"name":argv[3],"desc":argv[4]}}
+            data["modules"]={num:{"name":name,"desc":desc}}
         else:
-            data["modules"][argv[2]] = {"name":argv[3],"desc":argv[4]}
-        with open("%s/%s.json"%(path, argv[5]), "w") as fs:
+            data["modules"][num] = {"name":name,"desc":desc}
+        with open("%s/%s.json"%(path,cat), "w") as fs:
             json.dump(data, fs, indent="\t")
     elif argv[1] in ["-f", "--fixed"]:
         if argc<6:
