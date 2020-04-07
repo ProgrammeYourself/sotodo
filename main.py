@@ -7,34 +7,42 @@ from commoncodes import CommonCode
 DIR = "" # folder were user data is stored
 
 class Application:
-	def __init__(self, workload, window=None):
-		self.workload = workload.data
-		self.window = window if window != None else None
+    def __init__(self, workload, window=None):
+        self.workload = workload.data
+        self.window = window if window != None else None
 
 class Workload:
-	def __init__(self, file):
-		with open(file, "r") as fs:
-		    self.data = json.load(fs)
+    def __init__(self):
+        with open(DIR+"workloads.json", "r") as fs:
+            self.data = json.load(fs)
+            self.categories = self.data["workloads"]
 
-	def get_fixed(self):
-		if "fixed" in self.data:
-		    return self.data["fixed"]
-		else:
-		    return ValueError(2,"subject has no fixed field")
+    def get_fixed(self):
+        if "fixed" in self.data:
+            return self.data["fixed"]
+        else:
+            return ValueError(2,"subject has no fixed field")
 
-	def get_modules(self):
-		return self.data["modules"]
+    def get_modules(self):
+        return self.data["modules"]
+
+    def get_categories(self):
+        return self.categories
 
 class Window:
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
+
+class Timeline:
+    def __init__(self):
+        pass
 
 def ArgumentHandler(argv):
     subjects = json.load(open("./data/workloads.json", "r"))["workloads"]
     argc = len(argv)
     if argc == 1:
         raise CommonCode(3, "", "dir")
-    if argv[1] == "-m":
+    if argv[1] in ["-m", "--module"]:
         if argc<6:
             raise CommonCode(3,"-m",",".join(["number","name","description","category"][len(argv)-2:]))
         elif argc>6:
@@ -51,7 +59,7 @@ def ArgumentHandler(argv):
             json.dump(data, fs, indent="\t")
         exit(0)
 
-    elif argv[1] == "-f":
+    elif argv[1] in ["-f", "--fixed"]:
         if argc<5:
             raise CommonCode(3,"-m",",".join(["name","description","category"][len(argv)-2:]))
         elif argc>5:
@@ -75,5 +83,5 @@ def ArgumentHandler(argv):
 
 
 ArgumentHandler(sys.argv)
-w = Workload("data/medt.json")
+w = Workload()
 a = Application(w, "Hello")
