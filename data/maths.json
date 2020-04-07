@@ -1,15 +1,15 @@
 {
-    "name": "maths",
-    "description": "Workload for the 1.class-LB",
-    "for_class": "1abHIT",
-    "fixed": {
-        "SA3": "25.03.2020",
-        "SA4": "27.05.2020"
-    },
-    "modules": {
-        "0.0":{
-            "name": "S02C",
-            "desc": "tsort"
-        }
-    }
+	"name": "maths",
+	"description": "Workload for the 1.class-LB",
+	"for_class": "1abHIT",
+	"fixed": {
+		"SA3": "25.03.2020",
+		"SA4": "27.05.2020"
+	},
+	"modules": {
+		"0.0": {
+			"name": "S02C",
+			"desc": "tsort"
+		}
+	}
 }

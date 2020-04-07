@@ -46,13 +46,6 @@ def ArgumentHandler(argv):
     argc = len(argv)
     if argc==1:
         raise CommonCode(3, "", "dir")
-    elif argc==2:
-        DIR=argv[1]
-        wlp=os.path.join(DIR,"workloads.json")
-        if not os.path.exists(wlp):
-            raise CommonCode(7, "", DIR, ": could not load 'workloads.json'")
-        with open(wlp, "r") as wlf:
-	        CATEGORIES = json.load(wlf)["workloads"]
     elif argv[1] in ["-m", "--module"]:
         arg  = argv[1]
         path = argv[6]
@@ -77,7 +70,7 @@ def ArgumentHandler(argv):
             json.dump(data, fs, indent="\t")
     elif argv[1] in ["-f", "--fixed"]:
         if argc<6:
-            raise CommonCode(3,argv[1],",".join(["name","date","category,", "directory"][len(argv)-2:]))
+            raise CommonCode(3,argv[1],",".join(["name","date","category","directory"][len(argv)-2:]))
         elif argc>6:
             raise CommonCode(4,argv[1],str(argc-6))
         arg  = argv[1]
@@ -86,13 +79,12 @@ def ArgumentHandler(argv):
         cat  = argv[4]
         path = argv[5]
         wlp=os.path.join(path,"workloads.json")
+        with open(wlp, "r") as wlf:
+            categories = json.load(wlf)["workloads"]
         if cat not in categories:
             raise CommonCode(24,cat,"category")
         elif not os.path.exists(wlp):
             raise CommonCode(7, "",path, ": could not load 'workloads.json'")
-        with open(wlp, "r") as wlf:
-            categories = json.load(wlf)["workloads"]
-        
         with open("%s/%s.json"%(path,cat), "r") as fs:
             data = json.load(fs)
         if "fixed" not in data.keys():
@@ -102,13 +94,13 @@ def ArgumentHandler(argv):
         with open("%s/%s.json"%(path,cat), "w") as fs:
             json.dump(data, fs, indent="\t")
     elif argv[1] in ["-t", "--timeline"]:
-    	if argc<4:
+        if argc<4:
             raise CommonCode(3,argv[1],",".join(["category","directory"][argc-2:]))
         elif argc>4:
             raise CommonCode(4,argv[1],str(argc-4))
-    	arg  = argv[1]
-    	cat  = argv[2]
-    	path = argv[3]
+        arg  = argv[1]
+        cat  = argv[2]
+        path = argv[3]
         categories = []
         workloads = {}
         wlp = os.path.join(path,"workloads.json")
@@ -123,7 +115,7 @@ def ArgumentHandler(argv):
         if not os.path.exists(path):
             raise CommonCode(24,path,"directory")
         for c in categories:
-        	cp=os.path.join(path,"%s.json"%c)
+            cp=os.path.join(path,"%s.json"%c)
             try:
             	with open(cp, "r") as cf:
                     fixed = json.load(cf)["fixed"]
@@ -151,6 +143,13 @@ def ArgumentHandler(argv):
                 key_len = len(k) if len(k) > key_len else key_len
             for key, value in fixed.items():
                 print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
+    elif argc==2:
+        DIR=argv[1]
+        wlp=os.path.join(DIR,"workloads.json")
+        if not os.path.exists(wlp):
+            raise CommonCode(7, "", DIR, ": could not load 'workloads.json'")
+        with open(wlp, "r") as wlf:
+	        CATEGORIES = json.load(wlf)["workloads"]
 
 
 ArgumentHandler(sys.argv)
