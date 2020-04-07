@@ -6,7 +6,7 @@ from commoncodes import CommonCode
 #install with `pip3 install commoncodes`
 #reference at https://mfederczuk.github.io/commoncodes/v/latest.html
 
-DIR = "" # folder were user data is stored
+DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)),"data/") # folder were user data is stored
 CATEGORIES = "" # list of all categories
 
 def convert_to_date(string, format):
@@ -19,8 +19,8 @@ class Application:
 
 class Workload:
     def __init__(self):
-        with open(DIR+"workloads.json", "r") as fs:
-            self.data = json.load(fs)
+        with open(os.path.join(DIR,"workloads.json"), "r") as flp:
+            self.data = json.load(flp)
 
     def get_fixed(self):
         if "fixed" in self.data:
@@ -48,9 +48,11 @@ def ArgumentHandler(argv):
         raise CommonCode(3, "", "dir")
     if argv[1] in ["-m", "--module"]:
         path = argv[6]
-        if not os.path.exists(path+"/workloads.json"):
+        wlp=os.path.join(path,"workloads.json")
+        if not os.path.exists():
             raise CommonCode(7, "", path, ": could not load 'workloads.json'")
-        categories = json.load(open(path+"/workloads.json", "r"))["workloads"]
+        with open(wlp, "r") as wlf:
+            categories = json.load(wlf)["workloads"]
         if argc<7:
             raise CommonCode(3,"-m",",".join(["number","name","description","category", "directory"][len(argv)-2:]))
         elif argc>7:
@@ -69,9 +71,11 @@ def ArgumentHandler(argv):
 
     elif argv[1] in ["-f", "--fixed"]:
         path = argv[5]
-        if not os.path.exists(path+"/workloads.json"):
+        wlp=os.path.join(path,"workloads.json")
+        if not os.path.exists(wlp):
             raise CommonCode(7, "", argv[5], ": could not load 'workloads.json'")
-        categories = json.load(open(path+"/workloads.json", "r"))["workloads"]
+        with open(wlp, "r") as wlf:
+            categories = json.load(wlf)["workloads"]
         if argc<6:
             raise CommonCode(3,"-m",",".join(["name","date","category,", "directory"][len(argv)-2:]))
         elif argc>6:
@@ -91,10 +95,12 @@ def ArgumentHandler(argv):
     elif argv[1] in ["-t", "--timeline"]:
         categories = []
         workloads = {}
+        wlp = os.path.join(argv[3],"workloads.json")
         if argv[2] == "all":
-            if not os.path.exists(argv[3]+"/workloads.json"):
+            if not os.path.exists(wlp):
                 raise CommonCode(7, "", argv[3], ": could not find directory'")
-            workloads = json.load(open(argv[3]+"/workloads.json", "r"))["workloads"]
+            with open(wlp, "r") as wlf:
+                workloads = json.load(wlf)["workloads"]
             categories.extend(workloads)
         else:
             categories.append(argv[2])
@@ -103,20 +109,23 @@ def ArgumentHandler(argv):
             raise CommonCode(7, "", argv[3], ": could not find directory'")
 
         for c in categories:
+        	cp=os.path.join(argv[3],"%s.json"%c)
             try:
-                fixed = json.load(open(argv[3]+"/%s.json"%c, "r"))["fixed"]
+            	with open(cp, "r") as cf:
+                    fixed = json.load(cf)["fixed"]
             except FileNotFoundError as fnfe:
                 match = False
                 if len(categories) == 1:
-                    if not os.path.exists(argv[3]+"/workloads.json"):
+                    if not os.path.exists(wlp):
                         raise CommonCode(7, "", argv[3], ": could not find directory'")
-                    workloads = json.load(open(argv[3]+"/workloads.json", "r"))["workloads"]
+                    with open(wlp, "r") as wlf:
+	                    workloads = json.load(wlf)["workloads"]
                     for w in workloads:
                         if SequenceMatcher(None, argv[2], w).ratio() >= 0.5:
                             print("Unknown category: Did you mean", w, "instead of", argv[2],"?")
                             match = True
                     if not match:
-                        print(fnfe)
+                        raise fnfe
                     exit(1)
 
             except KeyError:
@@ -131,10 +140,12 @@ def ArgumentHandler(argv):
         exit()
 
     else:
-        if not os.path.exists(argv[1]+"/workloads.json"):
+    	wlp=os.path.join(argv[1],"/workloads.json")
+        if not os.path.exists(wlp):
             raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
         DIR = argv[1]
-        CATEGORIES = json.load(open(argv[1]+"/workloads.json", "r"))["workloads"]
+        with open(wlp, "r") as wlf:
+	        CATEGORIES = json.load(wlf)["workloads"]
 
 
 ArgumentHandler(sys.argv)
