@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-import sys, json
+import sys, os, json
 from commoncodes import CommonCode
 #install with `pip3 install commoncodes`
 #reference at https://mfederczuk.github.io/commoncodes/v/latest.html
+
+DIR = "" # folder were user data is stored
 
 class Application:
 	def __init__(self, workload, window=None):
@@ -29,12 +31,12 @@ class Window:
 
 def ArgumentHandler(argv):
     subjects = json.load(open("./data/workloads.json", "r"))["workloads"]
-    argc=len(argv)
+    argc = len(argv)
     if argc == 1:
-        return
+        raise CommonCode(3, "", "dir")
     if argv[1] == "-m":
         if argc<6:
-            raise CommonCode(3,"-m",",".join(["number","name","description","category"][len(self.argv)-2:]))
+            raise CommonCode(3,"-m",",".join(["number","name","description","category"][len(argv)-2:]))
         elif argc>6:
             raise CommonCode(4,"-m",str(argc-6))
         elif argv[5] not in subjects:
@@ -47,9 +49,11 @@ def ArgumentHandler(argv):
             data["modules"][argv[2]] = {"name":argv[3],"desc":argv[4]}
         with open("data/%s.json"%argv[5], "w") as fs:
             json.dump(data, fs, indent="\t")
+        exit(0)
+
     elif argv[1] == "-f":
         if argc<5:
-            raise CommonCode(3,"-m",",".join(["name","description","category"][len(self.argv)-2:]))
+            raise CommonCode(3,"-m",",".join(["name","description","category"][len(argv)-2:]))
         elif argc>5:
             raise CommonCode(4,"-m",str(argc-6))
         elif argv[4] not in subjects:
@@ -62,9 +66,14 @@ def ArgumentHandler(argv):
             data["fixed"][argv[2]] = argv[3]
         with open("data/%s.json"%argv[4], "w") as fs:
             json.dump(data, fs, indent="\t")
+        exit(0)
+
     else:
-        raise CommonCode(6,argv[1])
+        if not os.path.exists(argv[1]+"/workloads.json"):
+            raise CommonCode(7, "", argv[1], ": could not find 'workloads.json'")
+        DIR = argv[1]
+
 
 ArgumentHandler(sys.argv)
-# w = Workload("data/medt.json")
-# a = Application(w, "Hello")
+w = Workload("data/medt.json")
+a = Application(w, "Hello")
