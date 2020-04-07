@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys, os, json
 from datetime import datetime
+from difflib import SequenceMatcher
 from commoncodes import CommonCode
 #install with `pip3 install commoncodes`
 #reference at https://mfederczuk.github.io/commoncodes/v/latest.html
@@ -88,16 +89,45 @@ def ArgumentHandler(argv):
         exit(0)
 
     elif argv[1] in ["-t", "--timeline"]:
-        category = argv[2]
+        categories = []
+        workloads = {}
+        if argv[2] == "all":
+            if not os.path.exists(argv[3]+"/workloads.json"):
+                raise CommonCode(7, "", argv[3], ": could not find directory'")
+            workloads = json.load(open(argv[3]+"/workloads.json", "r"))["workloads"]
+            categories.extend(workloads)
+        else:
+            categories.append(argv[2])
+
         if not os.path.exists(argv[3]):
             raise CommonCode(7, "", argv[3], ": could not find directory'")
-        fixed = json.load(open(argv[3]+"/%s.json"%category, "r"))["fixed"]
-        print("Timeline for ", category, ":\n")
-        key_len = 0
-        for k in fixed.keys():
-            key_len = len(k) if len(k) > key_len else key_len
-        for key, value in fixed.items():
-            print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
+
+        for c in categories:
+            try:
+                fixed = json.load(open(argv[3]+"/%s.json"%c, "r"))["fixed"]
+            except FileNotFoundError as fnfe:
+                match = False
+                if len(categories) == 1:
+                    if not os.path.exists(argv[3]+"/workloads.json"):
+                        raise CommonCode(7, "", argv[3], ": could not find directory'")
+                    workloads = json.load(open(argv[3]+"/workloads.json", "r"))["workloads"]
+                    for w in workloads:
+                        if SequenceMatcher(None, argv[2], w).ratio() >= 0.5:
+                            print("Unknown category: Did you mean", w, "instead of", argv[2],"?")
+                            match = True
+                    if not match:
+                        print(fnfe)
+                    exit(1)
+
+            except KeyError:
+                raise CommonCode(74, "category has no fixed field")
+
+            print("\033[1m\033[35m", c, "\033[m")
+            key_len = 0
+            for k in fixed.keys():
+                key_len = len(k) if len(k) > key_len else key_len
+            for key, value in fixed.items():
+                print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
         exit()
 
     else:
