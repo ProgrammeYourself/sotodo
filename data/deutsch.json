@@ -11,6 +11,14 @@
 		"3.3": {
 			"name": "Bericht",
 			"desc": "Hello"
+		},
+		"4.0": {
+			"name": "New",
+			"desc": "Hello"
+		},
+		"4.1": {
+			"name": "New",
+			"desc": "Hello"
 		}
 	}
 }
