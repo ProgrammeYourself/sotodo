@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 import sys, os, json
+from datetime import datetime
 from commoncodes import CommonCode
 #install with `pip3 install commoncodes`
 #reference at https://mfederczuk.github.io/commoncodes/v/latest.html
 
 DIR = "" # folder were user data is stored
 CATEGORIES = "" # list of all categories
+
+def convert_to_date(string, format):
+    return datetime.strptime(string, format)
 
 class Application:
     def __init__(self, workload, window=None):
@@ -16,7 +20,6 @@ class Workload:
     def __init__(self):
         with open(DIR+"workloads.json", "r") as fs:
             self.data = json.load(fs)
-            CATEGORIES = self.data["workloads"]
 
     def get_fixed(self):
         if "fixed" in self.data:
@@ -85,12 +88,23 @@ def ArgumentHandler(argv):
         exit(0)
 
     elif argv[1] in ["-t", "--timeline"]:
-        pass
+        category = argv[2]
+        if not os.path.exists(argv[3]):
+            raise CommonCode(7, "", argv[3], ": could not find directory'")
+        fixed = json.load(open(argv[3]+"/%s.json"%category, "r"))["fixed"]
+        print("Timeline for ", category, ":\n")
+        key_len = 0
+        for k in fixed.keys():
+            key_len = len(k) if len(k) > key_len else key_len
+        for key, value in fixed.items():
+            print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
+        exit()
 
     else:
         if not os.path.exists(argv[1]+"/workloads.json"):
             raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
         DIR = argv[1]
+        CATEGORIES = json.load(open(argv[1]+"/workloads.json", "r"))["workloads"]
 
 
 ArgumentHandler(sys.argv)
