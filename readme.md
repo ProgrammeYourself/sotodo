@@ -10,10 +10,12 @@
 
 ## Usage
 
+### Terminal arguments
+
 ### Files
 
 * [```main.py```]() : main script
-* [```data/workload.json```]() : summary of all subjects
+* [```data/workload.json```]() : summary of all categories
 
 ### Basics
 
