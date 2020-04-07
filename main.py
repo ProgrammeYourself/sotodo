@@ -5,6 +5,7 @@ from commoncodes import CommonCode
 #reference at https://mfederczuk.github.io/commoncodes/v/latest.html
 
 DIR = "" # folder were user data is stored
+CATEGORIES = "" # list of all categories
 
 class Application:
     def __init__(self, workload, window=None):
@@ -15,7 +16,7 @@ class Workload:
     def __init__(self):
         with open(DIR+"workloads.json", "r") as fs:
             self.data = json.load(fs)
-            self.categories = self.data["workloads"]
+            CATEGORIES = self.data["workloads"]
 
     def get_fixed(self):
         if "fixed" in self.data:
@@ -27,7 +28,7 @@ class Workload:
         return self.data["modules"]
 
     def get_categories(self):
-        return self.categories
+        return CATEGORIES
 
 class Window:
     def __init__(self):
@@ -38,47 +39,57 @@ class Timeline:
         pass
 
 def ArgumentHandler(argv):
-    subjects = json.load(open("./data/workloads.json", "r"))["workloads"]
     argc = len(argv)
     if argc == 1:
         raise CommonCode(3, "", "dir")
     if argv[1] in ["-m", "--module"]:
-        if argc<6:
-            raise CommonCode(3,"-m",",".join(["number","name","description","category"][len(argv)-2:]))
-        elif argc>6:
+        path = argv[6]
+        if not os.path.exists(path+"/workloads.json"):
+            raise CommonCode(7, "", path, ": could not load 'workloads.json'")
+        categories = json.load(open(path+"/workloads.json", "r"))["workloads"]
+        if argc<7:
+            raise CommonCode(3,"-m",",".join(["number","name","description","category", "directory"][len(argv)-2:]))
+        elif argc>7:
             raise CommonCode(4,"-m",str(argc-6))
-        elif argv[5] not in subjects:
+        elif argv[5] not in categories:
             raise CommonCode(7,"-m",argv[5],": category does not exist")
-        with open("data/%s.json"%argv[5], "r") as fs:
+        with open("%s/%s.json"%(path, argv[5]), "r") as fs:
             data = json.load(fs)
         if "modules" not in data.keys():
             data["modules"]={argv[2]:{"name":argv[3],"desc":argv[4]}}
         else:
             data["modules"][argv[2]] = {"name":argv[3],"desc":argv[4]}
-        with open("data/%s.json"%argv[5], "w") as fs:
+        with open("%s/%s.json"%(path, argv[5]), "w") as fs:
             json.dump(data, fs, indent="\t")
         exit(0)
 
     elif argv[1] in ["-f", "--fixed"]:
-        if argc<5:
-            raise CommonCode(3,"-m",",".join(["name","description","category"][len(argv)-2:]))
-        elif argc>5:
+        path = argv[5]
+        if not os.path.exists(path+"/workloads.json"):
+            raise CommonCode(7, "", argv[5], ": could not load 'workloads.json'")
+        categories = json.load(open(path+"/workloads.json", "r"))["workloads"]
+        if argc<6:
+            raise CommonCode(3,"-m",",".join(["name","date","category,", "directory"][len(argv)-2:]))
+        elif argc>6:
             raise CommonCode(4,"-m",str(argc-6))
-        elif argv[4] not in subjects:
+        elif argv[4] not in categories:
             raise CommonCode(7,"-f",argv[4],": category does not exist")
-        with open("data/%s.json"%argv[4], "r") as fs:
+        with open("%s/%s.json"%(path, argv[4]), "r") as fs:
             data = json.load(fs)
         if "fixed" not in data.keys():
             data["fixed"]={argv[2]:argv[3]}
         else:
             data["fixed"][argv[2]] = argv[3]
-        with open("data/%s.json"%argv[4], "w") as fs:
+        with open("%s/%s.json"%(path, argv[4]), "w") as fs:
             json.dump(data, fs, indent="\t")
         exit(0)
 
+    elif argv[1] in ["-t", "--timeline"]:
+        pass
+
     else:
         if not os.path.exists(argv[1]+"/workloads.json"):
-            raise CommonCode(7, "", argv[1], ": could not find 'workloads.json'")
+            raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
         DIR = argv[1]
 
 
