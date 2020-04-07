@@ -44,9 +44,16 @@ class Timeline:
 
 def ArgumentHandler(argv):
     argc = len(argv)
-    if argc == 1:
+    if argc==1:
         raise CommonCode(3, "", "dir")
-    if argv[1] in ["-m", "--module"]:
+    elif argc==2:
+    	wlp=os.path.join(argv[1],"workloads.json")
+        if not os.path.exists(wlp):
+            raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
+        DIR = argv[1]
+        with open(wlp, "r") as wlf:
+	        CATEGORIES = json.load(wlf)["workloads"]
+    elif argv[1] in ["-m", "--module"]:
         path = argv[6]
         wlp=os.path.join(path,"workloads.json")
         if not os.path.exists():
@@ -67,8 +74,6 @@ def ArgumentHandler(argv):
             data["modules"][argv[2]] = {"name":argv[3],"desc":argv[4]}
         with open("%s/%s.json"%(path, argv[5]), "w") as fs:
             json.dump(data, fs, indent="\t")
-        exit(0)
-
     elif argv[1] in ["-f", "--fixed"]:
         path = argv[5]
         wlp=os.path.join(path,"workloads.json")
@@ -90,8 +95,6 @@ def ArgumentHandler(argv):
             data["fixed"][argv[2]] = argv[3]
         with open("%s/%s.json"%(path, argv[4]), "w") as fs:
             json.dump(data, fs, indent="\t")
-        exit(0)
-
     elif argv[1] in ["-t", "--timeline"]:
         categories = []
         workloads = {}
@@ -137,15 +140,6 @@ def ArgumentHandler(argv):
                 key_len = len(k) if len(k) > key_len else key_len
             for key, value in fixed.items():
                 print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
-        exit()
-
-    else:
-    	wlp=os.path.join(argv[1],"workloads.json")
-        if not os.path.exists(wlp):
-            raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
-        DIR = argv[1]
-        with open(wlp, "r") as wlf:
-	        CATEGORIES = json.load(wlf)["workloads"]
 
 
 ArgumentHandler(sys.argv)
