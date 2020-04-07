@@ -140,7 +140,7 @@ def ArgumentHandler(argv):
         exit()
 
     else:
-    	wlp=os.path.join(argv[1],"/workloads.json")
+    	wlp=os.path.join(argv[1],"workloads.json")
         if not os.path.exists(wlp):
             raise CommonCode(7, "", argv[1], ": could not load 'workloads.json'")
         DIR = argv[1]
