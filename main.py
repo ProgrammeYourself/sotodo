@@ -107,7 +107,11 @@ def ArgumentHandler(argv):
         path = argv[3]
         categories = []
         workloads = {}
+        if not os.path.exists(path):
+            raise CommonCode(24,path,"directory")
         wlp = os.path.join(path,"workloads.json")
+        if not os.path.exists(wlp):
+            raise CommonCode(24,path,"directory")
         if cat == "all":
             if not os.path.exists(wlp):
                 raise CommonCode(7, "",path, ": could not find directory'")
@@ -116,37 +120,44 @@ def ArgumentHandler(argv):
             categories.extend(workloads)
         else:
             categories.append(cat)
-        if not os.path.exists(path):
-            raise CommonCode(24,path,"directory")
         for c in categories:
+            ignore=False
             cp=os.path.join(path,"%s.json"%c)
             try:
             	with open(cp, "r") as cf:
                     fixed = json.load(cf)["fixed"]
             except FileNotFoundError as fnfe:
-                match = False
                 if len(categories) == 1:
-                    if not os.path.exists(wlp):
-                        raise CommonCode(24,path,"directory")
+                    match = False
                     with open(wlp, "r") as wlf:
 	                    workloads = json.load(wlf)["workloads"]
                     for w in workloads:
                         if SequenceMatcher(None,cat, w).ratio() >= 0.5:
-                            print("Unknown category: Did you mean", w, "instead of",cat,"?")
+                            print("Unknown category: Did you mean '"+w+"' instead of '"+cat+"'?")
                             match = True
                     if not match:
                         raise fnfe
                     exit(1)
+                else:
+                    ignore=True
 
             except KeyError:
-                raise CommonCode(74, "category has no fixed field")
+                if len(categories) == 1:
+                    raise CommonCode(74, "category '%s' has no fixed field"%c)
+                else:
+                    ignore=True
 
-            print("\033[1m\033[35m", c, "\033[m")
-            key_len = 0
-            for k in fixed.keys():
-                key_len = len(k) if len(k) > key_len else key_len
-            for key, value in fixed.items():
-                print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
+            if not ignore:
+                print("\033[1m\033[35m", c, "\033[m")
+                key_len = 0
+                for k in fixed.keys():
+                    key_len = len(k) if len(k) > key_len else key_len
+                for key, value in fixed.items():
+                    print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
+    
+    elif argv[1] in ["-c", "--check"]:
+        pass
+
     elif argc==2:
         DIR=argv[1]
         wlp=os.path.join(DIR,"workloads.json")
