@@ -156,8 +156,65 @@ def ArgumentHandler(argv):
                     print(value, "|", key+(" "*(key_len-len(key))), "| in", (convert_to_date(value, "%d.%m.%Y")-datetime.now()).days, " days")
     
     elif argv[1] in ["-c", "--check"]:
-        pass
+        if argc<3:
+            raise CommonCode(3,argv[1],",","directory")
+        elif argc>3:
+            raise CommonCode(4,argv[1],str(argc-3))
+        path = argv[2]
+        wlp = os.path.join(path, "workloads.json")
+        ok     = "\033[32m\033[1mok\033[m"
+        failed = "\033[31m\033[1mfailed\033[m"
+        warning= lambda text : "\033[1m\033[48:2:255:165:0mwarning:\033[m %s"%text
+        reqkeys = [("name", "description", "for_class", "modules"), ("name", "desc")]
 
+        for p in (path, wlp):
+            print("Checking if '%s' exists..."%p, end=" ")
+            if not os.path.exists(p):
+                print(failed)
+                raise CommonCode(24,p,"directory")
+            print(ok)
+        with open(wlp, "r") as fs:
+            wl=json.load(fs)
+            print("Checking if 'workloads.json' has correct key...", end=" ")
+            if "workloads" in wl.keys():
+                print(ok)
+            else:
+                print(failed)
+                raise CommonCode(65,"Please use 'workloads' instead of '"+list(wl.keys())[0]+"'")
+        ct=wl["workloads"]
+        cfs= []
+        print("Checking if each category has it´s own json...")
+        for c in ct:
+            if not os.path.exists(os.path.join(path, "%s.json"%c)):
+                print(warning("Category '%s' has no json, please add it."%c))
+                continue
+            else:
+                print("%s:"%c,ok)
+                cfs.append(os.path.join(path, "%s.json"%c))
+        print("Checking validation of files...")
+        for f in cfs:
+            print("\033[1m\033[35m", f, "\033[m")
+            with open(f, "r") as fs:
+                okay=True
+                try:
+                    data=json.load(fs)
+                except Exception as e:
+                    print(failed, e)
+                for rk in reqkeys[0]:
+                    if not rk in data.keys():
+                        print(warning("found missing key '%s', please add it."%rk))
+                        okay=False
+                for m in data["modules"]:
+                    if not type(data["modules"][m]) is dict:
+                        print(warning("module data should be a dictionary."))
+                        okay=False
+                    for rk in reqkeys[1]:
+                        if rk not in data["modules"][m].keys():
+                            print(warning("found missing key '%s' in '%s', please add it."%(rk,m)))
+                            okay=False
+                if okay==True: print(ok)
+                
+        
     elif argc==2:
         DIR=argv[1]
         wlp=os.path.join(DIR,"workloads.json")
