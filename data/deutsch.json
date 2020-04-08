@@ -1,6 +1,6 @@
 {
 	"name": "deutsch",
-	"description": "Workload for the 1.class-LB",
+	"description": "for_class is missing",
 	"fixed": {
 		"SA2": "11.03.2020",
 		"T3": "15.04.2020",
@@ -16,7 +16,7 @@
 			"desc": "Hello"
 		},
 		"4.1": {
-			"name": "New"
+			"name": "missing description"
 		}
 	}
 }
