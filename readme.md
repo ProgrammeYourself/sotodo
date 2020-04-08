@@ -10,17 +10,28 @@
 
 ## Usage
 
-### Terminal arguments
+### run
+
+Simply run this script with the following command:
+
+```console
+pc@user:~/path/to/file$ python3 main.py directory
+```
+
+### optional arguments
+
+`todo`
 
 ### Files
 
-* [```main.py```]() : main script
-* [```data/workload.json```]() : summary of all categories
+* [```main.py```](https://github.com/ProgrammeYourself/sotodo/blob/master/main.py) : main script
+* [```data/workload.json```](https://github.com/ProgrammeYourself/sotodo/blob/master/data/workloads.json) : summary of all categories
+* ```data/*.json``` categories
 
 ### Basics
 
-```todo```
+`todo`
 
 ### Example
 
-```todo```
+`todo`
